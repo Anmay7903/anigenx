@@ -1,0 +1,8 @@
+project-folder/
+├── index.html             ← User view
+├── login.html             ← Login page
+├── register.html          ← Signup for premium
+├── admin.html             ← Admin dashboard
+├── style.css              ← Styles
+├── script.js              ← App logic (search, modal, auth, load)
+└── localStorage (used as fake DB for demo)

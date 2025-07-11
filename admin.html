@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Admin Panel</title>
+    <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+    <header>
+        <h1>Admin Upload Panel</h1>
+    </header>
+
+    <main>
+        <form id="uploadForm">
+            <input type="text" id="videoTitle" placeholder="Video Title" required />
+
+            <label><b>Video Source:</b></label><br>
+            <input type="radio" name="videoType" value="url" checked> URL
+            <input type="radio" name="videoType" value="file"> Upload File<br><br>
+
+            <div id="videoUrlInput">
+                <input type="url" id="videoURL" placeholder="Video URL (.mp4, .mkv)" />
+            </div>
+            <div id="videoFileInput" style="display:none">
+                <input type="file" id="videoFile" accept=".mp4,.mkv" />
+            </div>
+
+            <label><b>Thumbnail:</b></label><br>
+            <input type="url" id="thumbnailURL" placeholder="Thumbnail URL" />
+            <p style="text-align:center">OR</p>
+            <input type="file" id="thumbnailFile" accept="image/*" /><br>
+
+            <label>
+                <input type="checkbox" id="isPremium" /> Premium Video
+            </label><br>
+
+            <button type="submit">Upload</button>
+        </form>
+        <p id="uploadStatus"></p>
+    </main>
+
+    <script>
+        // Switch input modes
+        document.querySelectorAll('input[name="videoType"]').forEach(radio => {
+            radio.addEventListener('change', () => {
+                const isUrl = document.querySelector('input[name="videoType"]:checked').value === "url";
+                document.getElementById('videoUrlInput').style.display = isUrl ? "block" : "none";
+                document.getElementById('videoFileInput').style.display = isUrl ? "none" : "block";
+            });
+        });
+
+        document.getElementById('uploadForm').addEventListener('submit', async function (e) {
+            e.preventDefault();
+            const title = document.getElementById('videoTitle').value;
+            const isPremium = document.getElementById('isPremium').checked;
+
+            let videoURL = "";
+            const type = document.querySelector('input[name="videoType"]:checked').value;
+
+            if (type === "url") {
+                videoURL = document.getElementById('videoURL').value;
+                if (!videoURL) return alert("Please provide a video URL.");
+            } else {
+                const file = document.getElementById('videoFile').files[0];
+                if (!file) return alert("Please upload a video file.");
+                videoURL = URL.createObjectURL(file);
+            }
+
+            let thumbURL = document.getElementById('thumbnailURL').value;
+            const thumbFile = document.getElementById('thumbnailFile').files[0];
+            if (!thumbURL && thumbFile) {
+                thumbURL = URL.createObjectURL(thumbFile);
+            }
+            if (!thumbURL) return alert("Please provide a thumbnail.");
+
+            const video = { title, url: videoURL, thumbnail: thumbURL, premium: isPremium };
+            let videos = JSON.parse(localStorage.getItem('videos')) || [];
+            videos.push(video);
+            localStorage.setItem('videos', JSON.stringify(videos));
+
+            document.getElementById('uploadStatus').textContent = "✅ Video uploaded!";
+            this.reset();
+        });
+    </script>
+</body>
+
+</html>
